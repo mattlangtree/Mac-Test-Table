@@ -8,8 +8,10 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface MUAppDelegate : NSObject <NSApplicationDelegate>
+@interface MUAppDelegate : NSObject <NSApplicationDelegate,NSTableViewDataSource,NSTableViewDelegate>
 
-@property (assign) IBOutlet NSWindow *window;
+@property (unsafe_unretained) IBOutlet NSTableView *recordTableView;
+
+@property (strong) IBOutlet NSWindow *window;
 
 @end
