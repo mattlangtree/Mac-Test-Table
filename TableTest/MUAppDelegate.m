@@ -22,7 +22,7 @@
 {
     [recordTableView setAllowsColumnSelection:NO];
     [recordTableView setUsesAlternatingRowBackgroundColors:YES];
-    [recordTableView setRowHeight:59.f];
+    [recordTableView setRowHeight:70];
     [recordTableView setHeaderView:nil];
     [recordTableView setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleSourceList];
 }
@@ -37,12 +37,12 @@
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-    return 3;
+    return 6;
 }
 
 - (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row
 {
-    return 59.f;
+    return 70;
 }
 
 - (NSString *)tableView:(NSTableView *)tableView toolTipForCell:(NSCell *)cell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation
