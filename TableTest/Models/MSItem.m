@@ -36,7 +36,7 @@ NSString * const kItemImageDidLoadNotification = @"com.mediumstack.mac.item.imag
     _text = [attributes valueForKeyPath:@"label"];
     _itemThumbImageURLString = [attributes valueForKeyPath:@"image_thumb_src"];
     _itemImageURLString = [attributes valueForKeyPath:@"image_large_src"];
-    NSLog(@"object: %@",self);
+    
     return self;
 }
 
