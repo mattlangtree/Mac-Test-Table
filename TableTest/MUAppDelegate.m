@@ -54,6 +54,8 @@
 
     // Handle user clicks on the segmented control
     [segmentedControl setAction:@selector(segControlClicked:)];
+    
+    [_window setTitle:@"Medium Stack — Images"];
 }
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)application
@@ -98,9 +100,11 @@
     NSInteger clickedSegment = [sender selectedSegment];
     if (clickedSegment == 0) {
         [tabView selectTabViewItemAtIndex:1];
+        [_window setTitle:@"Medium Stack — Images"];
     }
     else {
         [tabView selectTabViewItemAtIndex:2];
+        [_window setTitle:@"Medium Stack — URLs"];
     }
 }
 
