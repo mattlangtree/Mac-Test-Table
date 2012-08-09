@@ -7,15 +7,36 @@
 //
 
 #import "MUAppDelegate.h"
+#import "MSItem.h"
 
 @implementation MUAppDelegate
 @synthesize window = _window;
+@synthesize thumbnailImageView;
+@synthesize itemsArrayController;
+@synthesize segmentedControl;
+@synthesize tabView;
 @synthesize recordTableView;
-
+@synthesize statusItem = _statusItem;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    // Insert code here to initialize your application
+    NSStatusBar *bar = [NSStatusBar systemStatusBar];
+
+    self.statusItem = [bar statusItemWithLength:NSSquareStatusItemLength];
+    [_statusItem setTitle: NSLocalizedString(@"MS",@"")];
+    [_statusItem setHighlightMode:YES];
+    [_statusItem setTarget:self];
+    [_statusItem setAction:@selector(statusItemClicked:)];
+
+    // Fetch latest images.
+    [MSItem publicTimelineItemsWithBlock:^(NSArray *items) {
+        self.itemsArrayController.content = items;
+    }];
+    
+    // When images come back from the server, update the tableview
+    [[NSNotificationCenter defaultCenter] addObserverForName:kItemImageDidLoadNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notification) {
+        [recordTableView reloadData];
+    }];
 }
 
 - (void)awakeFromNib
@@ -25,6 +46,14 @@
     [recordTableView setRowHeight:70];
     [recordTableView setHeaderView:nil];
     [recordTableView setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleSourceList];
+    [recordTableView setTarget:self];
+    [recordTableView setDoubleAction:@selector(doubleClick:)];
+
+    // Show image tab by default
+    [tabView selectTabViewItemAtIndex:1];
+
+    // Handle user clicks on the segmented control
+    [segmentedControl setAction:@selector(segControlClicked:)];
 }
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)application
@@ -35,10 +64,19 @@
     return YES;
 }
 
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
-{
-    return 6;
+- (void)doubleClick:(id)object {
+    NSInteger rowNumber = [recordTableView clickedRow];
+    MSItem *rowItem = [self.itemsArrayController.content objectAtIndex:rowNumber];
+    
+    NSLog(@"row large image: %@",rowItem.itemImageURL);
+    
+    [[NSWorkspace sharedWorkspace] openURL:rowItem.itemImageURL];
 }
+
+//- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
+//{
+//    return 6;
+//}
 
 - (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row
 {
@@ -50,9 +88,45 @@
     return @"You are a banana head";
 }
 
-- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+//- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+//{
+//    return @"This is a test.";
+//}
+
+- (IBAction)segControlClicked:(id)sender
 {
-    return @"This is a test.";
+    NSInteger clickedSegment = [sender selectedSegment];
+    if (clickedSegment == 0) {
+        [tabView selectTabViewItemAtIndex:1];
+    }
+    else {
+        [tabView selectTabViewItemAtIndex:2];
+    }
 }
+
+#pragma mark - Status Bar item bits
+
+-(void)statusItemClicked:(id)sender{
+    NSWindow *aWindow = [self window];
+    NSApplication *myApp = [NSApplication sharedApplication];
+    
+    if (![aWindow isKeyWindow]) {
+        [aWindow makeKeyAndOrderFront:self];
+        [myApp activateIgnoringOtherApps:YES];
+        [aWindow orderFrontRegardless];
+    }
+    else{
+        if ([myApp isActive]){
+            // Hide the window
+            [aWindow orderOut:sender];
+        }
+        else{
+            // Display the window
+            [myApp activateIgnoringOtherApps:YES];
+            [aWindow orderFrontRegardless];
+        }
+    }
+}
+
 
 @end
